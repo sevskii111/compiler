@@ -9,7 +9,7 @@ big weird multiline comment
 ";re// /* " //string with comment symbols
 "fsd\"" //string with escaped "
 if (a>b && c < b || b >= c) {}
-for (i = 0;i < 1e10;i++) {
+for (i = 0;i < 1e10;i += 1) {
     a = a|b;
     c = a & b;
     d *= c;
