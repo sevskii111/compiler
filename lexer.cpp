@@ -25,7 +25,7 @@ bool isDigit(char c)
 
 bool isCorrectIdPart(char c)
 {
-    return c == '$' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || isDigit(c);
+    return isCorrectIdStart(c) || isDigit(c);
 }
 
 bool isAsgnStart(char c)
