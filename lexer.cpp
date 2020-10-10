@@ -15,7 +15,7 @@ bool isSpace(char c)
 
 bool isCorrectIdStart(char c)
 {
-    return c == '$' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+    return c == '$' || c == '_' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 }
 
 bool isDigit(char c)
