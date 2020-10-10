@@ -203,7 +203,7 @@ LexerResult parseCode(std::istream &code)
                                 {
                                     state = LexTypes::SINGLE_LINE_COMMENT;
                                 }
-                                else if (next = '*')
+                                else if (next == '*')
                                 {
                                     state = LexTypes::MULTI_LINE_COMMENT;
                                 }

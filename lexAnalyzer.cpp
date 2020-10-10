@@ -5,18 +5,6 @@
 #include <iostream>
 #include <map>
 
-void replaceAll(std::string &str, const std::string &from, const std::string &to)
-{
-    if (from.empty())
-        return;
-    size_t start_pos = 0;
-    while ((start_pos = str.find(from, start_pos)) != std::string::npos)
-    {
-        str.replace(start_pos, from.length(), to);
-        start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
-    }
-}
-
 void writeLexems(std::vector<Lex> lexems)
 {
     std::ofstream o("resultLexems.csv", std::ofstream::binary);
@@ -27,8 +15,7 @@ void writeLexems(std::vector<Lex> lexems)
         if (lexem.type != LexTypes::SINGLE_LINE_COMMENT && lexem.type != LexTypes::MULTI_LINE_COMMENT)
         {
             std::string escapedRaw = lexem.raw;
-            replaceAll(escapedRaw, "\"", "\"\"");
-            o << lexem.line << ", \" " << escapedRaw << " \"," << lexIdToName[lexem.type];
+            o << lexem.line << ", " << escapedRaw << "," << lexIdToName[lexem.type];
             if (lexem.val != -1)
             {
                 o << "," << lexem.val;
