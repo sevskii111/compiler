@@ -5,31 +5,30 @@
 #include <iostream>
 #include <map>
 
-std::string readFile(std::string fileName)
+void replaceAll(std::string &str, const std::string &from, const std::string &to)
 {
-    std::ifstream t(fileName);
-    std::string str;
-
-    t.seekg(0, std::ios::end);
-    str.reserve(t.tellg());
-    t.seekg(0, std::ios::beg);
-
-    str.assign((std::istreambuf_iterator<char>(t)),
-               std::istreambuf_iterator<char>());
-
-    return str;
+    if (from.empty())
+        return;
+    size_t start_pos = 0;
+    while ((start_pos = str.find(from, start_pos)) != std::string::npos)
+    {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+    }
 }
 
 void writeLexems(std::vector<Lex> lexems)
 {
-    std::ofstream o("resultLexems.csv");
+    std::ofstream o("resultLexems.csv", std::ofstream::binary);
     o << "Line, Raw, Type, Value" << std::endl;
     for (int i = 0; i < lexems.size(); i++)
     {
         Lex lexem = lexems[i];
         if (lexem.type != LexTypes::SINGLE_LINE_COMMENT && lexem.type != LexTypes::MULTI_LINE_COMMENT)
         {
-            o << lexem.line << "," << lexem.raw << "," << lexIdToName[lexem.type];
+            std::string escapedRaw = lexem.raw;
+            replaceAll(escapedRaw, "\"", "\"\"");
+            o << lexem.line << ", \" " << escapedRaw << " \"," << lexIdToName[lexem.type];
             if (lexem.val != -1)
             {
                 o << "," << lexem.val;
@@ -45,7 +44,7 @@ std::map<std::string, int> idsMap;
 
 void writeKeywords(std::map<std::string, int> keywords)
 {
-    std::ofstream o("resultKeywords.csv");
+    std::ofstream o("resultKeywords.csv", std::ofstream::binary);
     o << "Keyword, index" << std::endl;
     for (std::pair<std::string, int> p : keywords)
     {
@@ -56,7 +55,7 @@ void writeKeywords(std::map<std::string, int> keywords)
 
 void writeIds(std::map<std::string, int> ids)
 {
-    std::ofstream o("resultIds.csv");
+    std::ofstream o("resultIds.csv", std::ofstream::binary);
     o << "ID, index" << std::endl;
     for (std::pair<std::string, int> p : ids)
     {
@@ -73,8 +72,8 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    std::string code = readFile(argv[1]);
-    LexerResult lexerResult = parseCode(code);
+    std::ifstream file(argv[1]);
+    LexerResult lexerResult = parseCode(file);
 
     writeLexems(lexerResult.lexems);
     writeKeywords(lexerResult.keywordsMap);

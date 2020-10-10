@@ -85,13 +85,9 @@ double calcNumberValue(double numberValue, bool isNumNegative, int eValue = 0, b
     return numberValue * pow(10, eValue);
 }
 
-char lookahead(std::string str, int pos)
+char lookahead(std::istream &code)
 {
-    int next_pos = pos + 1;
-    if (next_pos > str.length())
-        return '\0';
-    else
-        return str[next_pos];
+    return code.peek();
 }
 
 std::map<std::string, int> makeKeywordsMap()
@@ -104,9 +100,10 @@ std::map<std::string, int> makeKeywordsMap()
     return result;
 }
 
-LexerResult parseCode(std::string code)
+LexerResult parseCode(std::istream &code)
 {
-    int pos = 0;
+    int start = code.tellg();
+
     int line_num = 1;
     std::string buff;
     LexTypes state = LexTypes::H;
@@ -122,18 +119,14 @@ LexerResult parseCode(std::string code)
     bool isNumNegative = false;
     bool isENegative = false;
 
-    while (pos <= code.length())
+    char c = code.get();
+
+    bool isScanFinished = false;
+    bool isLastStep = false;
+
+    while (!isScanFinished)
     {
         bool makeStep = true;
-        char c;
-        if (pos < code.length())
-        {
-            c = code[pos];
-        }
-        else
-        {
-            c = '\n';
-        }
         switch (state)
         {
         case LexTypes::ERR:
@@ -184,11 +177,11 @@ LexerResult parseCode(std::string code)
                     }
                     else
                     {
-                        char next = lookahead(code, pos);
+                        char next = lookahead(code);
                         if (next == '=')
                         {
                             buff += next;
-                            pos++;
+                            code.get();
                             lexems.push_back(Lex(line_num, LexTypes::ASGN, buff));
                         }
                         else
@@ -205,7 +198,7 @@ LexerResult parseCode(std::string code)
                             }
                             else if (isCommentStart(c))
                             {
-                                char next = lookahead(code, pos);
+                                char next = lookahead(code);
                                 if (next == '/')
                                 {
                                     state = LexTypes::SINGLE_LINE_COMMENT;
@@ -228,11 +221,11 @@ LexerResult parseCode(std::string code)
                 }
                 else if (isDeliStart(c))
                 {
-                    char next = lookahead(code, pos);
+                    char next = lookahead(code);
                     if ((c == '<' && next == '=') || (c == '>' && next == '=') || (c == '&' && next == '&') || (c == '|' && next == '|'))
                     {
                         buff += next;
-                        pos++;
+                        code.get();
                     }
                     lexems.push_back(Lex(line_num, LexTypes::DELI, buff));
                 }
@@ -253,10 +246,10 @@ LexerResult parseCode(std::string code)
                 buff += c;
             }
         case MULTI_LINE_COMMENT:
-            if (c == '*' && lookahead(code, pos) == '/')
+            if (c == '*' && lookahead(code) == '/')
             {
                 lexems.push_back(Lex(line_num, LexTypes::MULTI_LINE_COMMENT, buff));
-                pos++;
+                code.get();
                 state = LexTypes::H;
             }
             else
@@ -266,10 +259,10 @@ LexerResult parseCode(std::string code)
             break;
 
         case STR:
-            if (c == '\\' && lookahead(code, pos) == '\"')
+            if (c == '\\' && lookahead(code) == '\"')
             {
                 buff += '\"';
-                pos++;
+                code.get();
             }
             else
             {
@@ -384,6 +377,7 @@ LexerResult parseCode(std::string code)
                 else
                 {
                     lexems.push_back(Lex(line_num, LexTypes::NUM, buff, calcNumberValue(numberValue, isNumNegative)));
+                    makeStep = false;
                     state = LexTypes::H;
                 }
                 break;
@@ -422,6 +416,7 @@ LexerResult parseCode(std::string code)
                 else
                 {
                     lexems.push_back(Lex(line_num, LexTypes::NUM, buff, calcNumberValue(numberValue, isNumNegative, eValue, isENegative)));
+                    makeStep = false;
                     state = LexTypes::H;
                 }
                 break;
@@ -442,20 +437,19 @@ LexerResult parseCode(std::string code)
                 if (keywordsMap.count(buff))
                 {
                     lexems.push_back(Lex(line_num, LexTypes::KEYWORD, buff, keywordsMap[buff]));
-                    state = LexTypes::H;
                 }
                 else if (idsMap.count(buff))
                 {
                     lexems.push_back(Lex(line_num, LexTypes::ID, buff, idsMap[buff]));
-                    state = LexTypes::H;
                 }
                 else
                 {
                     int newIdPos = idsMap.size();
                     lexems.push_back(Lex(line_num, LexTypes::ID, buff, newIdPos));
                     idsMap[buff] = newIdPos;
-                    state = LexTypes::H;
                 }
+                makeStep = false;
+                state = LexTypes::H;
             }
 
             break;
@@ -463,12 +457,24 @@ LexerResult parseCode(std::string code)
         default:
             break;
         }
-        if (c == '\n')
-            line_num++;
 
         if (makeStep)
         {
-            pos++;
+            if (c == '\n')
+                line_num++;
+            if (isLastStep)
+            {
+                isScanFinished = true;
+            }
+            else
+            {
+                c = code.get();
+                if (code.eof())
+                {
+                    c = '\0';
+                    isLastStep = true;
+                }
+            }
         }
     }
 
@@ -476,6 +482,9 @@ LexerResult parseCode(std::string code)
     result.idsMap = idsMap;
     result.keywordsMap = keywordsMap;
     result.lexems = lexems;
+
+    code.clear();
+    code.seekg(start);
 
     return result;
 }

@@ -4,7 +4,7 @@
 #include <streambuf>
 #include <iostream>
 
-bool printComments = false;
+bool printComments = true;
 
 void printLexems(std::vector<Lex> lexems)
 {
@@ -35,33 +35,24 @@ std::string readFile(std::string fileName)
 
 int main()
 {
-    std::string testNumbers = readFile("testNumber.txt");
-    std::cout << "testing numbers parsing:" << std::endl;
-    std::cout << testNumbers;
-    std::cout << std::endl;
-    LexerResult lexerResult = parseCode(testNumbers);
+    std::ifstream numbersFile("testNumber.txt");
+    LexerResult lexerResult = parseCode(numbersFile);
     std::vector<Lex> lexems = lexerResult.lexems;
     printLexems(lexems);
 
     std::cout << std::endl;
     std::cout << std::endl;
 
-    std::string testMixed = readFile("testMix.txt");
-    std::cout << "testing mixed parsing:" << std::endl;
-    std::cout << testMixed;
-    std::cout << std::endl;
-    lexerResult = parseCode(testMixed);
+    std::ifstream mixedFile("testMix.txt");
+    lexerResult = parseCode(mixedFile);
     lexems = lexerResult.lexems;
     printLexems(lexems);
 
     std::cout << std::endl;
     std::cout << std::endl;
 
-    std::string testFibanaci = readFile("testFibanaci.txt");
-    std::cout << "testing fibanaci parsing:" << std::endl;
-    std::cout << testFibanaci;
-    std::cout << std::endl;
-    lexerResult = parseCode(testFibanaci);
+    std::ifstream fibanaciFile("testFibanaci.txt");
+    lexerResult = parseCode(fibanaciFile);
     lexems = lexerResult.lexems;
     printLexems(lexems);
 }

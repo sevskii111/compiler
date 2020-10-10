@@ -4,7 +4,7 @@
       "type": "shell",
       "label": "C/C++: g++ build active file",
       "command": "/usr/bin/g++",
-      "args": ["-g", "lexer.cpp", "test.cpp", "-o", "test.out"],
+      "args": ["-g", "lexer.cpp", "lexAnalyzer.cpp", "-o", "lexAnalyzer.out"],
       "options": {
         "cwd": "${workspaceFolder}"
       },

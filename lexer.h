@@ -5,6 +5,7 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <fstream>
 
 enum LexTypes
 {
@@ -50,4 +51,4 @@ public:
     std::map<std::string, int> idsMap;
 };
 
-LexerResult parseCode(std::string code);
+LexerResult parseCode(std::istream &code);
