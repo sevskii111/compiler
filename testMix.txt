@@ -1,0 +1,16 @@
+//i am comment
+/*
+" * /
+///
+/*
+*/
+1.23e-2
+"12345"
+";re// /* "
+"fsd\""
+if () {}
+a && b || b
+if
+for 
+return 
+a<=b

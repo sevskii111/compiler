@@ -1,0 +1,143 @@
+<Program> ::=  
+
+<Statement List> ; 
+
+ 
+
+<Statement List> ::=  
+
+<Statement> |  
+
+<Statement List> <Statement> ; 
+
+ 
+
+<Statement> ::=  
+
+<If Statement> |  
+
+<If Else Statement> | 
+
+<Iteration Statement> |  
+
+<Expression> |  
+
+<Block> |  
+
+<Return Statement> |  
+
+<With Statement> ; 
+
+ 
+
+<Block> ::=  
+
+'{' '}' |  
+
+'{' <Statement List> '}' ; 
+
+ 
+
+<If Statement> ::=  
+
+'if' '(' <Expression> ')' <Statement> ; 
+
+ 
+
+<If Else Statement> ::=  
+
+'if' '(' <Expression> ')' <Statement> 'else' <Statement> ; 
+
+ 
+
+<Iteration Statement> ::=  
+
+'for' '(' <Expression> ';' <Expression> ';' <Expression> ')' <Statement> |  
+
+'for' '(' ID ‘in’ <Expression> ')' <Statement> | 
+
+'for' '(' ID ‘of’ <Expression> ')' <Statement>  ; 
+
+ 
+
+<Return Statement> ::=  
+
+'return' ';' | 
+
+'return' <Expression> ';' ; 
+
+ 
+
+<Expression> ::=  
+
+< Relational Expression > ; 
+
+ 
+
+< Relational Expression >::=  
+
+< Additive Expression> 
+
+| <Relational Expression> '<' <Additive Expression> 
+
+| <Relational Expression> '>' <Additive Expression> 
+
+| <Relational Expression> '<=' <Additive Expression> 
+
+| <Relational Expression> '>=' <Additive Expression>; 
+
+ 
+
+<Assignment Expression> ::=  
+
+<Logical Or Expression> |  
+
+ID <Assignment Operator> <Assignment Expression> ; 
+
+ 
+
+<Assignment Operator> ::= '='  |  '*='  |  '/=' | '+=' | '-=' ; 
+
+ 
+
+<Logical Or Expression> ::=  
+
+<Logical And Expression> |  
+
+<Logical Or Expression> '||' <Logical And Expression> ; 
+
+ 
+
+<Logical And Expression> ::=  
+
+<Bitwise Or Expression> |  
+
+<Logical And Expression> '&&' <Bitwise Or Expression> ; 
+
+ 
+
+<Bitwise Or Expression> ::=  
+
+<Bitwise And Expression> | 
+
+<Bitwise Or Expression> '|' <Bitwise And Expression> ; 
+
+ 
+
+<Bitwise And Expression> ::=  
+
+<Argument> | 
+
+<Bitwise And Expression> '&' <Equality Expression> ; 
+
+ 
+
+<Argument> ::= ID | INT | FLOAT | STRING; 
+
+ 
+
+ID ::= идентификатор (может содержать знак доллара) 
+
+NUMBER ::= целое число  
+
+STRING ::= строка в двойных кавычках 
