@@ -4,6 +4,7 @@ const std::vector<std::string>
     keywords = {"if", "for", "in", "of", "return"};
 
 const std::set<char> space = {' ', '\n', '\t', '\0', '\r'};
+const std::set<char> lineEnd = {'\n', '\0', '\r'};
 const std::set<char> asgnStart = {'=', '*', '/', '+', '-'};
 const std::set<char> deliStart = {';', '(', ')', '{', '}', '>', '<', '&', '|'};
 const std::set<char> es = {'e', 'E'};
@@ -11,6 +12,11 @@ const std::set<char> es = {'e', 'E'};
 bool isSpace(char c)
 {
     return space.count(c);
+}
+
+bool isLineEnd(char c)
+{
+    return lineEnd.count(c);
 }
 
 bool isCorrectIdStart(char c)
@@ -132,6 +138,7 @@ LexerResult parseCode(std::istream &code)
         case LexTypes::ERR:
             lexems.push_back(Lex(line_num, LexTypes::ERR, buff));
             state = LexTypes::H;
+            makeStep = false;
             break;
 
         case LexTypes::H:
@@ -236,7 +243,7 @@ LexerResult parseCode(std::istream &code)
             }
             break;
         case SINGLE_LINE_COMMENT:
-            if (c == '\n')
+            if (isLineEnd(c))
             {
                 lexems.push_back(Lex(line_num, LexTypes::SINGLE_LINE_COMMENT, buff));
                 state = LexTypes::H;
@@ -245,12 +252,19 @@ LexerResult parseCode(std::istream &code)
             {
                 buff += c;
             }
+            break;
+
         case MULTI_LINE_COMMENT:
             if (c == '*' && lookahead(code) == '/')
             {
+                buff += "*/";
                 lexems.push_back(Lex(line_num, LexTypes::MULTI_LINE_COMMENT, buff));
                 code.get();
                 state = LexTypes::H;
+            }
+            else if (isLastStep)
+            {
+                state = LexTypes::ERR;
             }
             else
             {
@@ -263,6 +277,10 @@ LexerResult parseCode(std::istream &code)
             {
                 buff += '\"';
                 code.get();
+            }
+            else if (isLineEnd(c))
+            {
+                state = LexTypes::ERR;
             }
             else
             {
@@ -476,6 +494,11 @@ LexerResult parseCode(std::istream &code)
                 }
             }
         }
+    }
+
+    if (state != LexTypes::H)
+    {
+        lexems.push_back(Lex(line_num, LexTypes::ERR, buff));
     }
 
     LexerResult result;
