@@ -281,6 +281,7 @@ LexerResult parseCode(std::istream &code)
             else if (isLineEnd(c))
             {
                 state = LexTypes::ERR;
+                makeStep = false;
             }
             else
             {
